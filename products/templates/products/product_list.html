@@ -6,7 +6,11 @@
   <div class="flex items-baseline justify-between mb-8 pb-4 border-b border-border">
     <div>
       <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-1">Catalog</p>
-      <h1 class="text-4xl font-extrabold">All Products</h1>
+      {% if active_category %}
+        <h1 class="text-4xl font-extrabold">{{ active_category }}</h1>
+      {% else %}
+          <h1 class="text-4xl font-extrabold">All Products</h1>
+      {% endif %}
     </div>
     <span class="font-mono text-xs text-gray-500">{{ products|length }} item{{ products|length|pluralize }}</span>
   </div>

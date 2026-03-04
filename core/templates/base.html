@@ -78,6 +78,28 @@
     </div>
 </nav>
 
+<!-- CATEGORY BAR -->
+{% if categories %}
+    <div class="bg-black border-b border-border">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                <a href="{% url 'products:list' %}"
+                   class="flex-shrink-0 font-mono text-[10px] uppercase tracking-widest px-4 py-3 transition-colors
+                  {% if not request.GET.category %}text-brand border-b-2 border-brand{% else %}text-gray-500 hover:text-white border-b-2 border-transparent{% endif %}">
+                    All
+                </a>
+                {% for category in categories %}
+                    <a href="{% url 'products:list' %}?category={{ category.slug }}"
+                       class="flex-shrink-0 font-mono text-[10px] uppercase tracking-widest px-4 py-3 transition-colors
+                    {% if request.GET.category == category.slug %}text-brand border-b-2 border-brand{% else %}text-gray-500 hover:text-white border-b-2 border-transparent{% endif %}">
+                        {{ category.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <!-- MESSAGES -->
 {% if messages %}
     <div class="max-w-6xl mx-auto w-full px-6 pt-5 flex flex-col gap-2">
@@ -86,7 +108,9 @@
           {% if message.tags == 'error' %}border-red-500 bg-surface text-red-400
           {% elif message.tags == 'success' %}border-green-400 bg-surface text-green-400
           {% elif message.tags == 'warning' %}border-yellow-400 bg-surface text-yellow-400
-          {% else %}border-brand bg-surface text-gray-300{% endif %}">{{ message }}</div>
+          {% else %}border-brand bg-surface text-gray-300{% endif %}">
+                {{ message }}
+            </div>
         {% endfor %}
     </div>
 {% endif %}

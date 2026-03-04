@@ -11,7 +11,7 @@ from products.repositories import CategoryRepository, ProductRepository
 
 
 class ProductListView(View):
-    """Displays the product catalog."""
+    """Displays the product catalog, optionally filtered by category slug."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -22,12 +22,22 @@ class ProductListView(View):
         """
         Return a list of products.
         """
-        products = self._product_repo.get_available()
-        categories = self._category_repo.get_all()
+        category_slug = request.GET.get("category")
+        active_category = None
+
+        if category_slug:
+            active_category = self._category_repo.get_by_slug(category_slug)
+            products = self._product_repo.get_available_by_category(active_category)
+        else:
+            products = self._product_repo.get_available()
+
         return render(
             request,
             "products/product_list.html",
-            {"products": products, "categories": categories},
+            {
+                "products": products,
+                "active_category": active_category,
+            },
         )
 
 
