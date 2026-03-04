@@ -22,8 +22,8 @@
             <h2 class="text-lg font-bold">Contact Information</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {% for fname in 'first_name,last_name,email,phone'|split:',' %}
-              {% with field=form|getitem:fname %}{% endwith %}
+            {% for fname in 'first_name,last_name,email,phone' %}
+              {% with field=form %}{% endwith %}
             {% endfor %}
             <!-- first_name -->
             <div class="flex flex-col gap-1">
