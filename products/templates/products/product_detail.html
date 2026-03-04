@@ -7,7 +7,12 @@
         <a href="{% url 'products:list' %}" class="hover:text-white transition-colors">Shop</a>
         <span>/</span>
         {% if product.category %}
-            <span>{{ product.category.name }}</span>
+            <span>
+            <a href="{% url 'products:list' %}?category={{ product.category.slug }}"
+               class="text-white hover:text-brand transition-colors">
+              <p class="font-semibold text-sm leading-snug">{{ product.category.name }}</p>
+            </a>
+            </span>
             <span>/</span>
         {% endif %}
         <span class="text-gray-300">{{ product.name }}</span>
