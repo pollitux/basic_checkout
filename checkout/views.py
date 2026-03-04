@@ -54,6 +54,9 @@ class CheckoutView(LoginRequiredMixin, View):
         )
 
     def post(self, request):
+        """
+        Checkout form.
+        """
         cart = self._cart_service.get_or_create_cart(request)
         if cart.is_empty:
             messages.warning(request, "Your cart is empty.")
@@ -106,6 +109,9 @@ class OrderConfirmationView(LoginRequiredMixin, View):
         self._order_repo = OrderRepository()
 
     def get(self, request, order_id):
+        """
+        Order confirmation page.
+        """
         order = get_object_or_404(
             Order,
             pk=order_id,
@@ -132,6 +138,9 @@ class OrderHistoryView(LoginRequiredMixin, View):
         self._order_repo = OrderRepository()
 
     def get(self, request):
+        """
+        Order history page.
+        """
         orders = self._order_repo.get_by_user(request.user)
         return render(
             request,
@@ -153,6 +162,9 @@ class OrderDetailView(LoginRequiredMixin, View):
         super().__init__(**kwargs)
 
     def get(self, request, order_id):
+        """
+        Order detail page.
+        """
         order = get_object_or_404(
             Order,
             pk=order_id,

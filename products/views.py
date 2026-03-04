@@ -19,6 +19,9 @@ class ProductListView(View):
         self._category_repo = CategoryRepository()
 
     def get(self, request):
+        """
+        Return a list of products.
+        """
         products = self._product_repo.get_available()
         categories = self._category_repo.get_all()
         return render(

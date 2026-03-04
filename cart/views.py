@@ -20,6 +20,9 @@ class CartDetailView(View):
         self._cart_service = CartService()
 
     def get(self, request):
+        """
+        Get cart details.
+        """
         cart = self._cart_service.get_or_create_cart(request)
         return render(request, "cart/cart_detail.html", {"cart": cart})
 
@@ -32,6 +35,9 @@ class AddToCartView(View):
         self._cart_service = CartService()
 
     def post(self, request, product_id: str):
+        """
+        Add a product to the cart (supports AJAX).
+        """
         is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
         try:
             quantity = int(request.POST.get("quantity", 1))
@@ -66,6 +72,9 @@ class RemoveFromCartView(View):
         self._cart_service = CartService()
 
     def post(self, request, item_id: str):
+        """
+        Remove a cart item from the cart (supports AJAX).
+        """
         try:
             self._cart_service.remove_item(request, item_id)
             messages.success(request, "Item removed from your cart.")
@@ -82,6 +91,9 @@ class UpdateCartView(View):
         self._cart_service = CartService()
 
     def post(self, request, item_id: str):
+        """
+        Update the quantity of a cart item (supports AJAX).
+        """
         try:
             quantity = int(request.POST.get("quantity", 1))
             self._cart_service.update_quantity(request, item_id, quantity)
