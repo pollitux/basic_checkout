@@ -88,6 +88,9 @@ class CartItemRepository(BaseRepository[CartItem]):
     """Handles CartItem persistence operations."""
 
     def get_by_id(self, pk) -> Optional[CartItem]:
+        """
+        Retrieve a cart by its ID.
+        """
         try:
             return CartItem.objects.select_related(
                 "product", "cart"

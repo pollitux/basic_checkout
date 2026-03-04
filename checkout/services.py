@@ -23,10 +23,7 @@ from core.exceptions import EmptyCartError, OrderCreationError
 from products.models import Product
 
 
-# ---------------------------------------------------------------------------
 # Strategy Pattern: Payment Processing
-# ---------------------------------------------------------------------------
-
 @dataclass
 class PaymentResult:
     """Value object returned by every payment strategy."""
@@ -44,6 +41,9 @@ class PaymentStrategy(ABC):
 
     @abstractmethod
     def process(self, amount: Decimal, order: Order) -> PaymentResult:
+        """
+        Process payment strategy.
+        """
         raise NotImplementedError
 
 
@@ -75,10 +75,7 @@ class StripePaymentStrategy(PaymentStrategy):
         raise NotImplementedError("Stripe integration not configured.")
 
 
-# ---------------------------------------------------------------------------
 # Factory Pattern: Order creation
-# ---------------------------------------------------------------------------
-
 class OrderFactory:
     """
     Creates Order and OrderItem instances from a Cart.
@@ -116,10 +113,7 @@ class OrderFactory:
         return items
 
 
-# ---------------------------------------------------------------------------
 # Checkout Service (Facade)
-# ---------------------------------------------------------------------------
-
 class CheckoutService:
     """
     Orchestrates the full checkout flow.
@@ -128,12 +122,12 @@ class CheckoutService:
     """
 
     def __init__(
-        self,
-        payment_strategy: Optional[PaymentStrategy] = None,
-        order_repo: Optional[OrderRepository] = None,
-        order_item_repo: Optional[OrderItemRepository] = None,
-        order_factory: Optional[OrderFactory] = None,
-        cart_service: Optional[CartService] = None,
+            self,
+            payment_strategy: Optional[PaymentStrategy] = None,
+            order_repo: Optional[OrderRepository] = None,
+            order_item_repo: Optional[OrderItemRepository] = None,
+            order_factory: Optional[OrderFactory] = None,
+            cart_service: Optional[CartService] = None,
     ):
         self._payment = payment_strategy or DummyPaymentStrategy()
         self._order_repo = order_repo or OrderRepository()
