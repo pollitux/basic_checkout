@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — Shop{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 font-mono text-xs text-gray-500 mb-8">
+        <a href="{% url 'products:list' %}" class="hover:text-white transition-colors">Shop</a>
+        <span>/</span>
+        {% if product.category %}
+            <span>{{ product.category.name }}</span>
+            <span>/</span>
+        {% endif %}
+        <span class="text-gray-300">{{ product.name }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        <!-- Image -->
+        <!-- Image -->
+        <div class="aspect-square bg-surface border border-border flex items-center justify-center overflow-hidden">
+            {% if product.image %}
+                <img src="{{ product.image }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+            {% else %}
+                <span class="text-8xl text-gray-800">&#9632;</span>
+            {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="flex flex-col gap-5">
+            {% if product.category %}
+                <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500">{{ product.category.name }}</span>
+            {% endif %}
+
+            <h1 class="text-4xl font-extrabold leading-tight">{{ product.name }}</h1>
+
+            <!-- Stock indicator -->
+            <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-widest">
+                <span class="w-2 h-2 rounded-full {% if product.is_in_stock %}bg-green-400{% else %}bg-red-400{% endif %}"></span>
+                <span class="{% if product.is_in_stock %}text-green-400{% else %}text-red-400{% endif %}">
+          {% if product.is_in_stock %}{{ product.stock }} in stock{% else %}Out of stock{% endif %}
+        </span>
+            </div>
+
+            <p class="font-mono text-brand font-bold text-4xl">${{ product.price }}</p>
+
+            {% if product.description %}
+                <p class="text-gray-400 text-sm leading-relaxed">{{ product.description }}</p>
+            {% endif %}
+
+            <div class="border-t border-border pt-5">
+                {% if product.is_in_stock %}
+                    <form method="POST" action="{% url 'cart:add' product.id %}" class="flex gap-3 items-center">
+                        {% csrf_token %}
+                        <!-- Qty stepper -->
+                        <div class="flex items-center border border-border bg-surface">
+                            <button type="button" id="dec"
+                                    class="px-4 py-3 text-gray-400 hover:text-white hover:bg-border transition-colors text-lg leading-none">
+                                −
+                            </button>
+                            <input type="number" name="quantity" id="qty" value="1" min="1" max="{{ product.stock }}"
+                                   class="w-12 text-center bg-transparent text-white font-mono text-sm py-3 focus:outline-none">
+                            <button type="button" id="inc"
+                                    class="px-4 py-3 text-gray-400 hover:text-white hover:bg-border transition-colors text-lg leading-none">
+                                +
+                            </button>
+                        </div>
+                        <button type="submit"
+                                class="flex-1 bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest py-3 hover:bg-brand-dim transition-colors">
+                            Add to Cart
+                        </button>
+                    </form>
+                {% else %}
+                    <button disabled
+                            class="w-full border border-border text-gray-600 font-mono text-xs uppercase tracking-widest py-3 cursor-not-allowed opacity-50">
+                        Out of Stock
+                    </button>
+                {% endif %}
+            </div>
+
+            <a href="{% url 'products:list' %}"
+               class="w-fit border border-border font-mono text-xs uppercase tracking-widest px-4 py-2 text-gray-400 hover:text-white hover:border-gray-400 transition-colors">
+                ← Back to Shop
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        const qty = document.getElementById('qty');
+        const max = parseInt(qty?.max || 999);
+        document.getElementById('dec')?.addEventListener('click', () => {
+            if (parseInt(qty.value) > 1) qty.value = parseInt(qty.value) - 1;
+        });
+        document.getElementById('inc')?.addEventListener('click', () => {
+            if (parseInt(qty.value) < max) qty.value = parseInt(qty.value) + 1;
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Your Cart — Shop{% endblock %}
+
+{% block content %}
+  <!-- Header -->
+  <div class="mb-8 pb-4 border-b border-border">
+    <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-1">Shopping</p>
+    <h1 class="text-4xl font-extrabold">Your Cart</h1>
+  </div>
+
+  {% if cart.is_empty %}
+    <div class="text-center py-24 text-gray-500">
+      <p class="text-5xl mb-4">&#9632;</p>
+      <p class="font-semibold text-xl mb-2">Your cart is empty</p>
+      <p class="font-mono text-xs mb-8">Looks like you haven't added anything yet.</p>
+      <a href="{% url 'products:list' %}"
+         class="bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-brand-dim transition-colors">
+        Browse Products
+      </a>
+    </div>
+  {% else %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+      <!-- Items table -->
+      <div class="lg:col-span-2">
+        <!-- Table header -->
+        <div class="grid grid-cols-12 gap-4 font-mono text-[10px] uppercase tracking-widest text-gray-500 pb-3 border-b border-border">
+          <div class="col-span-5">Product</div>
+          <div class="col-span-2 text-right">Price</div>
+          <div class="col-span-3 text-center">Qty</div>
+          <div class="col-span-2 text-right">Subtotal</div>
+        </div>
+
+        <!-- Items -->
+        {% for item in cart.items.all %}
+          <div class="grid grid-cols-12 gap-4 items-center py-5 border-b border-border">
+            <!-- Product info -->
+            <div class="col-span-5 flex items-center gap-3">
+              <div class="w-14 h-14 bg-black border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {% if item.product.image %}
+                  <img src="{{ item.product.image }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                  <span class="text-xl text-gray-700">&#9632;</span>
+                {% endif %}
+              </div>
+              <div>
+                <a href="{% url 'products:detail' item.product.slug %}"
+                   class="text-sm font-semibold text-white hover:text-brand transition-colors leading-snug">
+                  {{ item.product.name }}
+                </a>
+                {% if item.product.category %}
+                  <p class="font-mono text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">{{ item.product.category.name }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="col-span-2 text-right font-mono text-sm text-gray-400">${{ item.product.price }}</div>
+
+            <!-- Qty update -->
+            <div class="col-span-3 flex justify-center">
+              <form method="POST" action="{% url 'cart:update' item.id %}">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="{{ item.quantity }}"
+                  min="1" max="{{ item.product.stock }}"
+                  onchange="this.form.submit()"
+                  class="w-16 text-center bg-black border border-border text-white font-mono text-sm px-2 py-2 focus:outline-none focus:border-brand">
+              </form>
+            </div>
+
+            <!-- Subtotal + remove -->
+            <div class="col-span-2 flex items-center justify-end gap-3">
+              <span class="font-mono font-bold text-brand text-sm">${{ item.subtotal }}</span>
+              <form method="POST" action="{% url 'cart:remove' item.id %}">
+                {% csrf_token %}
+                <button type="submit"
+                  class="text-gray-600 hover:text-red-400 transition-colors font-mono text-xs leading-none">✕</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="pt-5">
+          <a href="{% url 'products:list' %}"
+             class="border border-border font-mono text-xs uppercase tracking-widest px-4 py-2 text-gray-400 hover:text-white hover:border-gray-400 transition-colors">
+            ← Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="bg-surface border border-border p-6 sticky top-24">
+        <h3 class="font-bold text-lg mb-5">Order Summary</h3>
+
+        <div class="flex justify-between items-center py-2 text-sm">
+          <span class="text-gray-400">Subtotal ({{ cart.total_items }} item{{ cart.total_items|pluralize }})</span>
+          <span class="font-mono">${{ cart.total_price }}</span>
+        </div>
+        <div class="flex justify-between items-center py-2 text-sm">
+          <span class="text-gray-400">Shipping</span>
+          <span class="font-mono text-gray-500">At checkout</span>
+        </div>
+
+        <div class="border-t border-border mt-3 pt-4 flex justify-between items-center">
+          <span class="font-bold">Estimated Total</span>
+          <span class="font-mono font-bold text-brand text-xl">${{ cart.total_price }}</span>
+        </div>
+
+        <div class="mt-6 flex flex-col gap-3">
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'checkout:checkout' %}"
+               class="block text-center bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest py-3 hover:bg-brand-dim transition-colors">
+              Proceed to Checkout →
+            </a>
+          {% else %}
+            <a href="{% url 'account_login' %}?next={% url 'checkout:checkout' %}"
+               class="block text-center bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest py-3 hover:bg-brand-dim transition-colors">
+              Login to Checkout →
+            </a>
+            <p class="font-mono text-[10px] text-gray-500 text-center">Login required to place an order.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  {% endif %}
+{% endblock %}

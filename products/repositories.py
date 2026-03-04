@@ -1,0 +1,70 @@
+"""
+products/repositories.py
+
+Product repository: isolates all product-related DB queries (SRP + DIP).
+Views and services depend on this abstraction, not on the ORM directly.
+"""
+from typing import List, Optional
+
+from core.repositories import BaseRepository
+from products.models import Category, Product
+
+
+class ProductRepository(BaseRepository[Product]):
+    """Concrete repository for Product persistence operations."""
+
+    def get_by_id(self, pk) -> Optional[Product]:
+        try:
+            return Product.objects.select_related("category").get(
+                pk=pk, is_active=True
+            )
+        except Product.DoesNotExist:
+            return None
+
+    def get_by_slug(self, slug: str) -> Optional[Product]:
+        try:
+            return Product.objects.select_related("category").get(
+                slug=slug, is_active=True
+            )
+        except Product.DoesNotExist:
+            return None
+
+    def get_all(self) -> List[Product]:
+        return list(
+            Product.objects.select_related("category").filter(is_active=True)
+        )
+
+    def get_available(self) -> List[Product]:
+        """Return only products with stock > 0."""
+        return list(
+            Product.objects.select_related("category").filter(
+                is_active=True, stock__gt=0
+            )
+        )
+
+    def save(self, entity: Product) -> Product:
+        entity.save()
+        return entity
+
+    def delete(self, entity: Product) -> None:
+        entity.delete()
+
+
+class CategoryRepository(BaseRepository[Category]):
+    """Concrete repository for Category persistence operations."""
+
+    def get_by_id(self, pk) -> Optional[Category]:
+        try:
+            return Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            return None
+
+    def get_all(self) -> List[Category]:
+        return list(Category.objects.all())
+
+    def save(self, entity: Category) -> Category:
+        entity.save()
+        return entity
+
+    def delete(self, entity: Category) -> None:
+        entity.delete()

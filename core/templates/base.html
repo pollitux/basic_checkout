@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}Shop{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#e8ff4a',
+                            dim: '#b8cc30',
+                        },
+                        surface: '#141414',
+                        border: '#2a2a2a',
+                    },
+                    fontFamily: {
+                        sans: ['"Syne"', 'sans-serif'],
+                        mono: ['"Space Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap"
+          rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-black text-gray-100 font-sans min-h-full flex flex-col">
+
+<!-- NAV -->
+<nav class="bg-surface border-b border-border sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href="{% url 'products:list' %}"
+           class="font-mono text-brand font-bold uppercase tracking-widest text-sm">
+            &#9632; Swipall - STORE
+        </a>
+        <div class="flex items-center gap-6">
+            <a href="{% url 'products:list' %}"
+               class="font-mono text-xs uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
+                Shop
+            </a>
+            <a href="{% url 'cart:detail' %}"
+               class="font-mono text-xs uppercase tracking-widest text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                Cart
+                {% if request.user.is_authenticated %}
+                    {% with items=request.user.cart.total_items %}
+                        {% if items %}
+                            <span class="bg-brand text-black text-[10px] font-bold font-mono px-2 py-0.5 rounded-full">{{ items }}</span>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'checkout:order_history' %}"
+                   class="font-mono text-xs uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
+                    Orders
+                </a>
+                <a href="{% url 'checkout:checkout' %}"
+                   class="bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest px-4 py-2 hover:bg-brand-dim transition-colors">
+                    Checkout
+                </a>
+                <a href="{% url 'account_logout' %}"
+                   class="border border-border text-gray-400 font-mono text-xs font-bold uppercase tracking-widest px-4 py-2 hover:text-white hover:border-gray-400 transition-colors">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{% url 'account_login' %}"
+                   class="bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest px-4 py-2 hover:bg-brand-dim transition-colors">
+                    Login
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+    <div class="max-w-6xl mx-auto w-full px-6 pt-5 flex flex-col gap-2">
+        {% for message in messages %}
+            <div class="font-mono text-sm px-4 py-3 border-l-4
+          {% if message.tags == 'error' %}border-red-500 bg-surface text-red-400
+          {% elif message.tags == 'success' %}border-green-400 bg-surface text-green-400
+          {% elif message.tags == 'warning' %}border-yellow-400 bg-surface text-yellow-400
+          {% else %}border-brand bg-surface text-gray-300{% endif %}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- MAIN -->
+<main class="flex-1 max-w-6xl mx-auto w-full px-6 py-10">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="border-t border-border py-6 text-center font-mono text-xs text-gray-600">
+    &copy; {% now "Y" %} Store &mdash; Built with Django + Swipall
+</footer>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

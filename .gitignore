@@ -1,0 +1,71 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environment
+venv/
+env/
+.venv/
+bin/
+include/
+lib/
+pip-selfcheck.json
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Sphinx documentation
+docs/_build/
+
+# Django specific
+*.log
+*.pot
+local_settings.py  # Consider ignoring if it contains sensitive info not in version control
+db.sqlite3         # Ignore the default sqlite database file
+media/             # Optionally ignore user-uploaded media files (if handled separately)
+static-cdn/        # Optionally ignore collected static files (if handled separately)
+
+# IDE-specific files
+.idea/             # JetBrains PyCharm project files
+.vscode/           # VS Code project files
+*.swp
+*.swo
+
+# Operating System files
+.DS_Store          # macOS files
+.Trashes
+ehthumbs.db
+Thumbs.db
+db.sqlite3

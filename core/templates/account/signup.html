@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Create Account — Shop{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-12 px-4">
+  <div class="w-full max-w-md flex flex-col gap-8">
+
+    <!-- Header -->
+    <div>
+      <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-brand block mb-2">&#9632; Account</span>
+      <h1 class="text-5xl font-extrabold leading-tight mb-2">Create<br>account.</h1>
+      <p class="text-gray-400 text-sm">Join to start shopping and track your orders.</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-surface border border-border p-8 flex flex-col gap-5">
+
+      {% if form.non_field_errors %}
+        <div class="border border-red-500 border-opacity-40 bg-red-500 bg-opacity-5 px-4 py-3">
+          {% for error in form.non_field_errors %}
+            <p class="font-mono text-xs text-red-400">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'account_signup' %}" novalidate class="flex flex-col gap-4">
+        {% csrf_token %}
+
+        {% for field in form %}
+          <div class="flex flex-col gap-1.5">
+            <label for="{{ field.id_for_label }}"
+                   class="font-mono text-[10px] uppercase tracking-widest text-gray-500">
+              {{ field.label }}
+            </label>
+            <input
+              type="{{ field.field.widget.input_type }}"
+              name="{{ field.html_name }}"
+              id="{{ field.id_for_label }}"
+              value="{{ field.value|default:'' }}"
+              placeholder="{{ field.label }}"
+              {% if field.field.required %}required{% endif %}
+              class="w-full bg-black border {% if field.errors %}border-red-500{% else %}border-border{% endif %} text-white font-mono text-sm px-4 py-3 focus:outline-none focus:border-brand placeholder-gray-700 transition-colors">
+            {% if field.help_text %}
+              <p class="font-mono text-[10px] text-gray-600 leading-relaxed">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+              {% for e in field.errors %}
+                <p class="font-mono text-[10px] text-red-400">{{ e }}</p>
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="submit"
+          class="w-full bg-brand text-black font-mono text-sm font-bold uppercase tracking-widest py-4 hover:bg-brand-dim transition-colors mt-1">
+          Create Account →
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="flex items-center gap-3 text-gray-700">
+        <div class="flex-1 h-px bg-border"></div>
+        <span class="font-mono text-[10px] uppercase tracking-widest">or</span>
+        <div class="flex-1 h-px bg-border"></div>
+      </div>
+
+      <p class="text-center font-mono text-xs text-gray-500">
+        Already have an account?
+        <a href="{% url 'account_login' %}" class="text-brand font-bold hover:underline">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

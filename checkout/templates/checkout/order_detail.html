@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Order Detail — Shop{% endblock %}
+
+{% block content %}
+  <!-- Header -->
+  <div class="flex flex-wrap items-start justify-between gap-4 mb-8 pb-4 border-b border-border">
+    <div>
+      <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-1">Order</p>
+      <h1 class="text-4xl font-extrabold">#{{ order.pk|stringformat:"s"|slice:":8"|upper }}</h1>
+      <p class="font-mono text-xs text-gray-500 mt-1">{{ order.created_at|date:"F d, Y" }}</p>
+    </div>
+    <span class="border border-brand text-brand font-mono text-[10px] uppercase tracking-widest px-4 py-1.5 self-start mt-2">
+      {{ order.get_status_display }}
+    </span>
+  </div>
+
+  <div class="max-w-3xl flex flex-col gap-6">
+
+    <!-- Items -->
+    <div class="bg-surface border border-border p-6">
+      <h3 class="font-bold mb-4">Items</h3>
+      <div class="divide-y divide-border">
+        {% for item in order.items.all %}
+          <div class="grid grid-cols-12 gap-3 py-3 items-center text-sm">
+            <div class="col-span-6">
+              <p class="font-semibold">{{ item.product_name }}</p>
+              {% if item.product %}
+                <a href="{% url 'products:detail' item.product.slug %}"
+                   class="font-mono text-[10px] text-gray-500 hover:text-brand transition-colors">
+                  View product →
+                </a>
+              {% endif %}
+            </div>
+            <div class="col-span-2 font-mono text-gray-400 text-center">${{ item.unit_price }}</div>
+            <div class="col-span-2 font-mono text-gray-400 text-center">×{{ item.quantity }}</div>
+            <div class="col-span-2 font-mono font-bold text-brand text-right">${{ item.subtotal }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- Totals -->
+      <div class="border-t border-border mt-3 pt-4 space-y-2">
+        <div class="flex justify-between text-sm"><span class="text-gray-400">Subtotal</span><span class="font-mono">${{ order.subtotal }}</span></div>
+        <div class="flex justify-between text-sm"><span class="text-gray-400">Shipping</span><span class="font-mono">${{ order.shipping_cost }}</span></div>
+        <div class="flex justify-between items-center pt-3 border-t border-border">
+          <span class="font-bold text-lg">Total</span>
+          <span class="font-mono font-bold text-brand text-2xl">${{ order.total }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping -->
+    <div class="bg-surface border border-border p-6">
+      <h3 class="font-bold mb-4">Shipping Details</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-1">Name</p>
+          <p class="text-sm">{{ order.full_name }}</p>
+        </div>
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-1">Email</p>
+          <p class="text-sm">{{ order.email }}</p>
+        </div>
+        {% if order.phone %}
+          <div>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-1">Phone</p>
+            <p class="text-sm">{{ order.phone }}</p>
+          </div>
+        {% endif %}
+        <div class="sm:col-span-2">
+          <p class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-1">Address</p>
+          <p class="text-sm text-gray-300 leading-relaxed">
+            {{ order.address_line_1 }}{% if order.address_line_2 %}, {{ order.address_line_2 }}{% endif %}<br>
+            {{ order.city }}, {{ order.state }} {{ order.postal_code }}<br>
+            {{ order.country }}
+          </p>
+        </div>
+        {% if order.notes %}
+          <div class="sm:col-span-2">
+            <p class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-1">Order Notes</p>
+            <p class="text-sm text-gray-400">{{ order.notes }}</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+      <a href="{% url 'checkout:order_history' %}"
+         class="border border-border font-mono text-xs uppercase tracking-widest px-5 py-2.5 text-gray-400 hover:text-white hover:border-gray-400 transition-colors">
+        ← All Orders
+      </a>
+      <a href="{% url 'products:list' %}"
+         class="bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-brand-dim transition-colors">
+        Continue Shopping
+      </a>
+    </div>
+  </div>
+{% endblock %}

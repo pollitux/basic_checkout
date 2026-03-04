@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}My Orders — Shop{% endblock %}
+
+{% block content %}
+    <div class="mb-8 pb-4 border-b border-border">
+        <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-1">Account</p>
+        <h1 class="text-4xl font-extrabold">My Orders</h1>
+    </div>
+
+    {% if orders %}
+        <div class="bg-surface border border-border overflow-hidden">
+            <!-- Table header -->
+            <div class="grid grid-cols-12 gap-4 font-mono text-[10px] uppercase tracking-widest text-gray-500 px-6 py-3 border-b border-border">
+                <div class="col-span-3">Order ID</div>
+                <div class="col-span-2">Date</div>
+                <div class="col-span-2 text-center">Items</div>
+                <div class="col-span-2 text-right">Total</div>
+                <div class="col-span-2 text-center">Status</div>
+                <div class="col-span-1"></div>
+            </div>
+
+            {% for order in orders %}
+                <div class="grid grid-cols-12 gap-4 items-center px-6 py-4 border-b border-border last:border-0 hover:bg-black hover:bg-opacity-30 transition-colors">
+                    <div class="col-span-3 font-mono font-bold text-sm">
+                        #{{ order.pk|stringformat:"s"|slice:":8"|upper }}
+                    </div>
+                    <div class="col-span-2 font-mono text-xs text-gray-400">
+                        {{ order.created_at|date:"M d, Y" }}
+                    </div>
+                    <div class="col-span-2 text-center text-sm text-gray-400">
+                        {{ order.items.count }} item{{ order.items.count|pluralize }}
+                    </div>
+                    <div class="col-span-2 text-right font-mono font-bold text-brand">
+                        ${{ order.total }}
+                    </div>
+                    <div class="col-span-2 flex justify-center">
+            <span class="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full
+              {% if order.status == 'confirmed' %}bg-green-400 bg-opacity-10 text-green-400 border border-green-400 border-opacity-20
+              {% elif order.status == 'processing' %}bg-yellow-400 bg-opacity-10 text-yellow-400 border border-yellow-400 border-opacity-20
+              {% elif order.status == 'shipped' %}bg-blue-400 bg-opacity-10 text-blue-400 border border-blue-400 border-opacity-20
+              {% elif order.status == 'delivered' %}bg-green-500 bg-opacity-10 text-green-300 border border-green-500 border-opacity-20
+              {% elif order.status == 'cancelled' %}bg-red-400 bg-opacity-10 text-red-400 border border-red-400 border-opacity-20
+              {% else %}bg-gray-700 text-gray-400{% endif %}">
+              {{ order.get_status_display }}
+            </span>
+                    </div>
+                    <div class="col-span-1 flex justify-end">
+                        <a href="{% url 'checkout:order_detail' order.pk %}"
+                           class="border border-border font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 text-gray-400 hover:text-white hover:border-gray-400 transition-colors">
+                            View →
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-24 text-gray-500">
+            <p class="text-5xl mb-4">&#9632;</p>
+            <p class="font-semibold text-xl mb-2">No orders yet</p>
+            <p class="font-mono text-xs mb-8">Your order history will appear here.</p>
+            <a href="{% url 'products:list' %}"
+               class="bg-brand text-black font-mono text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-brand-dim transition-colors">
+                Start Shopping
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

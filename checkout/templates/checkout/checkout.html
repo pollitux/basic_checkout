@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Checkout — Shop{% endblock %}
+
+{% block content %}
+  <!-- Header -->
+  <div class="mb-8 pb-4 border-b border-border">
+    <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-1">Step 2 of 2</p>
+    <h1 class="text-4xl font-extrabold">Checkout</h1>
+  </div>
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+      <!-- LEFT: Form sections -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+
+        <!-- Contact -->
+        <div class="bg-surface border border-border p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-7 h-7 bg-brand text-black font-mono text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+            <h2 class="text-lg font-bold">Contact Information</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for fname in 'first_name,last_name,email,phone'|split:',' %}
+              {% with field=form|getitem:fname %}{% endwith %}
+            {% endfor %}
+            <!-- first_name -->
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.first_name.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">First Name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<p class="font-mono text-[10px] text-red-400">{{ form.first_name.errors|join:", " }}</p>{% endif %}
+            </div>
+            <!-- last_name -->
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.last_name.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Last Name</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<p class="font-mono text-[10px] text-red-400">{{ form.last_name.errors|join:", " }}</p>{% endif %}
+            </div>
+            <!-- email -->
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.email.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Email</label>
+              {{ form.email }}
+              {% if form.email.errors %}<p class="font-mono text-[10px] text-red-400">{{ form.email.errors|join:", " }}</p>{% endif %}
+            </div>
+            <!-- phone -->
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.phone.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Phone (optional)</label>
+              {{ form.phone }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="bg-surface border border-border p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-7 h-7 bg-brand text-black font-mono text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+            <h2 class="text-lg font-bold">Shipping Address</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2 flex flex-col gap-1">
+              <label for="{{ form.address_line_1.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Address Line 1</label>
+              {{ form.address_line_1 }}
+              {% if form.address_line_1.errors %}<p class="font-mono text-[10px] text-red-400">{{ form.address_line_1.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="sm:col-span-2 flex flex-col gap-1">
+              <label for="{{ form.address_line_2.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Address Line 2 (optional)</label>
+              {{ form.address_line_2 }}
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.city.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">City</label>
+              {{ form.city }}
+              {% if form.city.errors %}<p class="font-mono text-[10px] text-red-400">{{ form.city.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.state.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">State / Province</label>
+              {{ form.state }}
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.postal_code.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Postal Code</label>
+              {{ form.postal_code }}
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="{{ form.country.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Country</label>
+              {{ form.country }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="bg-surface border border-border p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-7 h-7 bg-brand text-black font-mono text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+            <h2 class="text-lg font-bold">Order Notes</h2>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="{{ form.notes.id_for_label }}" class="font-mono text-[10px] uppercase tracking-widest text-gray-500">Notes (optional)</label>
+            {{ form.notes }}
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Order Summary -->
+      <div class="bg-surface border border-border p-6 sticky top-24">
+        <h3 class="font-bold text-lg mb-5">Order Summary</h3>
+
+        <!-- Items -->
+        <div class="flex flex-col divide-y divide-border">
+          {% for item in cart.items.all %}
+            <div class="flex items-center gap-3 py-3">
+              <div class="relative w-12 h-12 bg-black border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {% if item.product.image %}
+                  <img src="{{ item.product.image }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                  <span class="text-lg text-gray-700">&#9632;</span>
+                {% endif %}
+                <span class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-brand text-black text-[9px] font-mono font-bold rounded-full flex items-center justify-center">{{ item.quantity }}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold truncate">{{ item.product.name }}</p>
+                <p class="font-mono text-[10px] text-gray-500">${{ item.product.price }} × {{ item.quantity }}</p>
+              </div>
+              <span class="font-mono text-sm font-bold text-brand flex-shrink-0">${{ item.subtotal }}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Totals -->
+        <div class="border-t border-border mt-3 pt-4 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-400">Subtotal</span>
+            <span class="font-mono">${{ cart.total_price }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-400">Shipping</span>
+            <span class="font-mono">$5.00</span>
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-border">
+            <span class="font-bold text-lg">Total</span>
+            <span class="font-mono font-bold text-brand text-xl">${{ cart.total_price }}</span>
+          </div>
+        </div>
+
+        <button type="submit"
+          class="w-full mt-6 bg-brand text-black font-mono text-sm font-bold uppercase tracking-widest py-4 hover:bg-brand-dim transition-colors">
+          Place Order →
+        </button>
+
+        <div class="flex items-center justify-center gap-2 mt-3 font-mono text-[10px] text-gray-600">
+          <span>&#128274;</span>
+          <span>Secure checkout</span>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="{% url 'cart:detail' %}" class="font-mono text-[10px] text-gray-500 hover:text-gray-300 transition-colors">← Edit cart</a>
+        </div>
+      </div>
+
+    </div>
+  </form>
+{% endblock %}
