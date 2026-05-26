@@ -15,12 +15,15 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path
 
+from config.api import api
+
 
 def root_redirect(request):
     return redirect("products:list")
 
 
 urlpatterns = [
+    path("api/", api.urls),
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("products/", include("products.urls", namespace="products")),
