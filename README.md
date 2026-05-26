@@ -19,6 +19,7 @@
 9. [Flujo de la aplicación](#9-flujo-de-la-aplicación)
 10. [Protección de URLs y seguridad](#10-protección-de-urls-y-seguridad)
 11. [Instalación y ejecución](#11-instalación-y-ejecución)
+12. [REST API](#12-rest-api)
 
 ---
 
@@ -718,6 +719,56 @@ python manage.py runserver
 ### Agregar productos de prueba
 
 Desde el panel de administración (`/admin/`) se pueden crear categorías y productos. El sistema requiere al menos un producto con `stock > 0` e `is_active = True` para que aparezca en el catálogo.
+
+---
+
+## 12. REST API
+
+El proyecto expone una **REST API** construida con [Django Ninja](https://django-ninja.dev/) disponible bajo el prefijo `/api/`.
+
+### Documentación interactiva
+
+Con el servidor corriendo, accede a:
+
+| URL | Descripción |
+|---|---|
+| `http://127.0.0.1:8000/api/docs` | Swagger UI — explorar y probar endpoints |
+| `http://127.0.0.1:8000/api/openapi.json` | Esquema OpenAPI 3.0 en JSON |
+
+La Swagger UI permite ejecutar cualquier endpoint directamente desde el navegador, incluyendo autenticación, sin necesidad de herramientas externas como Postman.
+
+### Endpoints disponibles
+
+| Método | URL | Auth | Descripción |
+|---|---|---|---|
+| `POST` | `/api/auth/login/` | — | Iniciar sesión |
+| `POST` | `/api/auth/logout/` | ✓ | Cerrar sesión |
+| `GET` | `/api/auth/me/` | ✓ | Usuario actual |
+| `GET` | `/api/products/` | — | Listar productos (`?category=<slug>`) |
+| `GET` | `/api/products/categories/` | — | Listar categorías |
+| `GET` | `/api/products/{slug}/` | — | Detalle de producto |
+| `GET` | `/api/cart/` | — | Ver carrito |
+| `POST` | `/api/cart/add/{product_id}/` | — | Agregar producto |
+| `PATCH` | `/api/cart/update/{item_id}/` | — | Actualizar cantidad |
+| `DELETE` | `/api/cart/remove/{item_id}/` | — | Eliminar item |
+| `POST` | `/api/checkout/` | ✓ | Realizar pedido |
+| `GET` | `/api/checkout/orders/` | ✓ | Historial de órdenes |
+| `GET` | `/api/checkout/orders/{id}/` | ✓ | Detalle de orden |
+| `GET` | `/api/contacts/` | ✓ | Listar contactos (`?segment=work`) |
+| `POST` | `/api/contacts/` | ✓ | Crear contacto |
+| `GET` | `/api/contacts/{id}/` | ✓ | Detalle de contacto |
+| `PUT` | `/api/contacts/{id}/` | ✓ | Actualizar contacto |
+| `DELETE` | `/api/contacts/{id}/` | ✓ | Eliminar contacto |
+
+### Autenticación
+
+La API utiliza autenticación por **sesión de Django** (cookie-based). Para endpoints protegidos (✓):
+
+1. Hacer `POST /api/auth/login/` con `username` y `password`
+2. El servidor establece la cookie de sesión automáticamente
+3. Incluir el header `X-CSRFToken` (valor de la cookie `csrftoken`) en peticiones `POST`, `PUT`, `PATCH` y `DELETE`
+
+La Swagger UI maneja el CSRF automáticamente al usarla desde el navegador.
 
 ---
 
