@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Contacts — Agenda{% endblock %}
+
+{% block content %}
+    <!-- Header -->
+    <div class="mb-8 pb-4 border-b border-border flex items-end justify-between">
+        <div>
+            <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-1">Agenda</p>
+            <h1 class="text-4xl font-extrabold">Contacts</h1>
+        </div>
+        <span class="font-mono text-xs text-gray-500">{{ contacts|length }} contact{{ contacts|length|pluralize }}</span>
+    </div>
+
+    <!-- Segment filter tabs -->
+    <div class="flex gap-2 mb-6 flex-wrap">
+        <a href="{% url 'contacts:list' %}"
+           class="font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 border transition-colors
+                  {% if not active_segment %}border-brand text-brand{% else %}border-border text-gray-500 hover:border-gray-400 hover:text-white{% endif %}">
+            All
+        </a>
+        {% for value, label in segments %}
+        <a href="{% url 'contacts:list' %}?segment={{ value }}"
+           class="font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 border transition-colors
+                  {% if active_segment == value %}border-brand text-brand{% else %}border-border text-gray-500 hover:border-gray-400 hover:text-white{% endif %}">
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if contacts %}
+        <div class="bg-surface border border-border overflow-hidden">
+            <!-- Table header -->
+            <div class="grid grid-cols-12 gap-4 font-mono text-[10px] uppercase tracking-widest text-gray-500 px-6 py-3 border-b border-border">
+                <div class="col-span-4">Name</div>
+                <div class="col-span-3">Contact</div>
+                <div class="col-span-2 text-center">Segment</div>
+                <div class="col-span-2 text-center">Birthday</div>
+                <div class="col-span-1 text-center">Status</div>
+            </div>
+
+            {% for contact in contacts %}
+                <div class="grid grid-cols-12 gap-4 items-center px-6 py-4 border-b border-border last:border-0 hover:bg-black hover:bg-opacity-30 transition-colors">
+
+                    <!-- Avatar + Name -->
+                    <div class="col-span-4 flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full overflow-hidden bg-black border border-border flex-shrink-0 flex items-center justify-center">
+                            {% if contact.photo %}
+                                <img src="{{ contact.photo }}" alt="{{ contact.full_name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <span class="font-mono font-bold text-xs text-gray-400">
+                                    {{ contact.full_name|slice:":1"|upper }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <span class="font-semibold text-sm truncate">{{ contact.full_name }}</span>
+                    </div>
+
+                    <!-- Email + Phone -->
+                    <div class="col-span-3">
+                        <p class="font-mono text-xs text-gray-300 truncate">{{ contact.email }}</p>
+                        <p class="font-mono text-[10px] text-gray-500 mt-0.5">{{ contact.phone }}</p>
+                    </div>
+
+                    <!-- Segment badge -->
+                    <div class="col-span-2 flex justify-center">
+                        <span class="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full border
+                            {% if contact.segment == 'favourite' %}bg-brand bg-opacity-10 text-brand border-brand border-opacity-20
+                            {% elif contact.segment == 'family' %}bg-purple-400 bg-opacity-10 text-purple-400 border-purple-400 border-opacity-20
+                            {% elif contact.segment == 'work' %}bg-blue-400 bg-opacity-10 text-blue-400 border-blue-400 border-opacity-20
+                            {% elif contact.segment == 'friends' %}bg-green-400 bg-opacity-10 text-green-400 border-green-400 border-opacity-20
+                            {% else %}bg-gray-700 bg-opacity-40 text-gray-400 border-gray-600{% endif %}">
+                            {{ contact.get_segment_display }}
+                        </span>
+                    </div>
+
+                    <!-- Birthday -->
+                    <div class="col-span-2 text-center font-mono text-xs text-gray-400">
+                        {% if contact.birthday %}
+                            {{ contact.birthday|date:"M d" }}
+                        {% else %}
+                            <span class="text-gray-600">—</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Blocked indicator -->
+                    <div class="col-span-1 flex justify-center">
+                        {% if contact.is_blocked %}
+                            <span class="font-mono text-[9px] uppercase tracking-widest px-2 py-1 rounded-full bg-red-400 bg-opacity-10 text-red-400 border border-red-400 border-opacity-20">
+                                Blocked
+                            </span>
+                        {% else %}
+                            <span class="w-2 h-2 rounded-full bg-green-400 bg-opacity-60 inline-block"></span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="text-center py-24 text-gray-500">
+            <p class="text-5xl mb-4">&#9632;</p>
+            <p class="font-semibold text-xl mb-2">No contacts found</p>
+            <p class="font-mono text-xs">
+                {% if active_segment %}
+                    No contacts in this segment.
+                {% else %}
+                    Your agenda is empty.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -26,6 +26,7 @@ urlpatterns = [
     path("products/", include("products.urls", namespace="products")),
     path("cart/", include("cart.urls", namespace="cart")),
     path("checkout/", include("checkout.urls", namespace="checkout")),
+    path("contacts/", include("contacts.urls", namespace="contacts")),
     path("", root_redirect, name="root"),
 ]
 
